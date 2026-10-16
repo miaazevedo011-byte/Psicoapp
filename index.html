@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsicoApp — Seu Companheiro de Estudos</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="estilos.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx-preview@0.2.10/dist/docx-preview.iife.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>🧠 PsicoApp</h1>
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        </header>
+
+        <nav id="sideMenu" class="side-menu">
+            <button class="close-btn" onclick="toggleMenu()">✕</button>
+            <ul>
+                <li><a href="#inicio" onclick="mostrarAba('inicio')">🏠 Início</a></li>
+                <li><a href="#materiais" onclick="mostrarAba('materiais')">📂 Meus Materiais</a></li>
+                <li><a href="#flashcards" onclick="mostrarAba('flashcards')">🃏 Flashcards</a></li>
+                <li><a href="#notas" onclick="mostrarAba('notas')">📝 Bloco de Notas</a></li>
+                <li><a href="#busca" onclick="mostrarAba('busca')">🔬 Busca Científica</a></li>
+                <li><a href="#ia" onclick="mostrarAba('ia')">🤖 Assistente de IA</a></li>
+                <li><a href="#central" onclick="mostrarAba('central')">📚 Central de Psicologia</a></li>
+            </ul>
+        </nav>
+
+        <main id="conteudo">
+            <section id="aba-inicio" class="aba ativa">
+                <h2>Bem-vindo(a) ao PsicoApp! 🎓</h2>
+                <p>Seu espaço completo de estudos em Psicologia.</p>
+                <div class="botoes-inicio">
+                    <button onclick="mostrarAba('materiais')">📂 Enviar Arquivos</button>
+                    <button onclick="mostrarAba('flashcards')">🃏 Estudar</button>
+                    <button onclick="mostrarAba('central')">📚 Ver Conteúdos</button>
+                </div>
+            </section>
+
+            <section id="aba-materiais" class="aba">
+                <h2>📂 Meus Materiais de Estudo</h2>
+                <div class="upload-area">
+                    <label for="arquivoEntrada" class="botao-upload">
+                        📎 Escolher Arquivo (PDF, DOCX, PNG, JPG)
+                    </label>
+                    <input type="file" id="arquivoEntrada" accept=".pdf,.docx,.png,.jpg,.jpeg" onchange="processarArquivo(event)">
+                </div>
+                <div id="listaArquivos" class="lista-arquivos">
+                    <p class="vazio">Nenhum arquivo salvo ainda. Envie um arquivo para começar!</p>
+                </div>
+                <div id="visualizador" class="visualizador"></div>
+            </section>
+
+            <section id="aba-flashcards" class="aba">
+                <h2>🃏 Flashcards</h2>
+                <div class="cartao-criacao">
+                    <h3>Criar Novo Cartão</h3>
+                    <input type="text" id="perguntaCartao" placeholder="Pergunta / Frente">
+                    <input type="text" id="respostaCartao" placeholder="Resposta / Verso">
+                    <button onclick="adicionarCartao()">➕ Salvar Cartão</button>
+                </div>
+                <div id="containerCartoes" class="container-cartoes">
+                    <p class="vazio">Nenhum cartão criado ainda. Crie acima para estudar!</p>
+                </div>
+            </section>
+
+            <section id="aba-notas" class="aba">
+                <h2>📝 Bloco de Notas & Post-its</h2>
+                <div class="nota-criacao">
+                    <input type="color" id="corNota" value="#fff3a0">
+                    <input type="text" id="textoNota" placeholder="Sua anotação rápida...">
+                    <button onclick="adicionarNota()">📌 Adicionar Post-it</button>
+                </div>
+                <div id="containerNotas" class="container-notas"></div>
+            </section>
+
+            <section id="aba-busca" class="aba">
+                <h2>🔬 Busca Científica</h2>
+                <input type="text" id="termoBusca" placeholder="Digite um tema ou palavra-chave...">
+                <div class="botoes-busca">
+                    <button onclick="buscar('scielo')">SciELO</button>
+                    <button onclick="buscar('pubmed')">PubMed</button>
+                    <button onclick="buscar('cochrane')">Cochrane</button>
+                    <button onclick="buscar('google')">Google Acadêmico</button>
+                    <button onclick="buscar('epistemonikos')">Epistemonikos</button>
+                    <button onclick="buscar('apa')">APA PsycNet</button>
+                </div>
+            </section>
+
+            <section id="aba-ia" class="aba">
+                <h2>🤖 Assistente de Estudos</h2>
+                <p class="dica">Você pode usar qualquer IA que preferir — copie sua pergunta e cole lá!</p>
+                <textarea id="perguntaIA" placeholder="Ex: Explique a teoria de Piaget de forma simples..."></textarea>
+                <button onclick="abrirIA()">🌐 Abrir IA para Pesquisar</button>
+            </section>
+
+            <section id="aba-central" class="aba">
+                <h2>📚 Central de Psicologia</h2>
+                <div class="sub-abas">
+                    <button class="botao-subaba ativo" onclick="mostrarSubaba('teoricos')">👤 Teóricos</button>
+                    <button class="botao-subaba" onclick="mostrarSubaba('termos')">📖 Termos</button>
+                    <button class="botao-subaba" onclick="mostrarSubaba('desenvolvimento')">👶 Psicologia do Desenvolvimento</button>
+                    <button class="botao-subaba" onclick="mostrarSubaba('linhatempo')">📅 Linha do Tempo</button>
+                    <button class="botao-subaba" onclick="mostrarSubaba('livros')">📚 Livros Principais</button>
+                    <button class="botao-subaba" onclick="mostrarSubaba('abreviacoes')">🔤 Abreviações</button>
+                </div>
+
+                <div id="subaba-teoricos" class="conteudo-subaba ativo">
+                    <h3>👤 Grandes Teóricos da Psicologia</h3>
+                    <div class="card-conteudo">
+                        <h4>Sigmund Freud — Psicanálise</h4>
+                        <p><strong>Principais conceitos:</strong> Id, Ego e Superego; Inconsciente; Fases do Desenvolvimento Psicossexual; Mecanismos de Defesa.</p>
+                        <p><strong>Obras principais:</strong> A Interpretação dos Sonhos (1900), Três Ensaios sobre a Teoria da Sexualidade (1905).</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Jean Piaget — Desenvolvimento Cognitivo</h4>
+                        <p><strong>Estágios:</strong> Sensório-motor (0-2 anos), Pré-operatório (2-7 anos), Operatório Concreto (7-11 anos), Operatório Formal (12+ anos).</p>
+                        <p><strong>Conceitos:</strong> Assimilação, Acomodação, Equilibração.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Lev Vygotski — Sociocultural</h4>
+                        <p><strong>Principais conceitos:</strong> Zona de Desenvolvimento Proximal; Mediação Social; Linguagem e Pensamento; Ferramentas Culturais.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Wilhelm Wundt — Pai da Psicologia Moderna</h4>
+                        <p><strong>1879:</strong> Fundou o primeiro laboratório de Psicologia em Leipzig, Alemanha. Separou a Psicologia da Filosofia e Fisiologia.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>B.F. Skinner — Comportamentalismo</h4>
+                        <p><strong>Comportamento Operante:</strong> Reforço Positivo, Reforço Negativo, Punição. O comportamento é moldado pelas consequências.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Erik Erikson — Desenvolvimento Psicossocial</h4>
+                        <p><strong>8 Estágios:</strong> Confiança vs Desconfiança (bebê), Autonomia vs Vergonha (criança), Iniciativa vs Culpa, Produtividade vs Inferioridade, Identidade vs Confusão, Intimidade vs Isolamento, Generatividade vs Estagnação, Integridade vs Desespero.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Albert Bandura — Aprendizagem Social</h4>
+                        <p><strong>Teoria:</strong> Aprendemos observando outros. Autoeficácia; Determinismo Recíproco.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Carl Rogers — Psicologia Humanista</h4>
+                        <p><strong>Princípios:</strong> Tendência Atualizante; Consideração Positiva Incondicional; Eu Real vs Eu Ideal; Empatia, Autenticidade, Aceitação.</p>
+                    </div>
+                </div>
+
+                <div id="subaba-termos" class="conteudo-subaba">
+                    <h3>📖 Termos da Psicologia</h3>
+                    <div class="card-conteudo">
+                        <p><strong>Psicologia:</strong> Estudo científico do comportamento e dos processos mentais.</p>
+                        <p><strong>Comportamento:</strong> Toda ação ou reação observável do indivíduo.</p>
+                        <p><strong>Processos Mentais:</strong> Pensamentos, sentimentos, percepções — atividades internas do cérebro.</p>
+                        <p><strong>Consciente:</strong> Tudo aquilo de que temos consciência no momento presente.</p>
+                        <p><strong>Inconsciente:</strong> Desejos, memórias e impulsos que estão fora da consciência mas influenciam o comportamento.</p>
+                        <p><strong>Percepção:</strong> Organização e interpretação das sensações.</p>
+                        <p><strong>Memória:</strong> Capacidade de codificar, armazenar e recuperar informações.</p>
+                        <p><strong>Aprendizagem:</strong> Mudança relativamente permanente no comportamento ou conhecimento por experiência.</p>
+                        <p><strong>Motivação:</strong> Conjunto de fatores que impulsionam e direcionam o comportamento.</p>
+                        <p><strong>Emoção:</strong> Reação subjetiva envolvendo alterações fisiológicas e comportamentais.</p>
+                    </div>
+                </div>
+
+                <div id="subaba-desenvolvimento" class="conteudo-subaba">
+                    <h3>👶 Psicologia do Desenvolvimento</h3>
+                    <div class="card-conteudo">
+                        <h4>Infância (0 a 6 anos)</h4>
+                        <p>Desenvolvimento motor, linguagem, vínculo afetivo, autonomia.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Infância Intermediária (6 a 12 anos)</h4>
+                        <p>Habilidades sociais, pensamento lógico, amizades, autoestima.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Adolescência (12 a 20 anos)</h4>
+                        <p>Busca de identidade, pensamento abstrato, independência, relações com pares.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Vida Adulta (20 a 60 anos)</h4>
+                        <p>Carreira, relacionamentos, filhos, contribuição para a sociedade.</p>
+                    </div>
+                    <div class="card-conteudo">
+                        <h4>Terceira Idade (60+ anos)</h4>
+                        <p>Reflexão sobre a vida, aceitação, bem-estar, manutenção de vínculos.</p>
+                    </div>
+                </div>
+
+                <div id="subaba-linhatempo" class="conteudo-subaba">
+                    <h3>📅 Linha do Tempo — História da Psicologia</h3>
+                    <div class="card-conteudo linha-tempo">
+                        <p><strong>✦ 1879 —</strong> Wilhelm Wundt funda o 1º laboratório de Psicologia (Leipzig, Alemanha) — nascimento da Psicologia como ciência</p>
+                        <p><strong>✦ 1890 —</strong> William James publica "Princípios de Psicologia" — Funcionalismo</p>
+                        <p><strong>✦ 1900 —</strong> Freud publica "A Interpretação dos Sonhos" — início da Psicanálise</p>
+                        <p><strong>✦ 1913 —</strong> John Watson lança o Comportamentalismo — foco apenas no observável</p>
+                        <p><strong>✦ 1950 —</strong> Início da Psicologia Humanista ("terceira força") — Rogers e Maslow</p>
+                        <p><strong>✦ 1950-60 —</strong> Revolução Cognitiva — estudo da mente e dos processos de pensamento</p>
+                        <p><strong>✦ 1970+ —</strong> Psicologia Cultural, Social e Neurociência — abordagens integradas</p>
+                    </div>
+                </div>
+
+                <div id="subaba-livros" class="conteudo-subaba">
+                    <h3>📚 Livros Fundamentais da Psicologia</h3>
+                    <div class="card-conteudo">
+                        <p>📖 <strong>A Interpretação dos Sonhos</strong> — Sigmund Freud</p>
+                        <p>📖 <strong>Princípios de Psicologia</strong> — William James</p>
+                        <p>📖 <strong>A Mente da Criança</strong> — Jean Piaget</p>
+                        <p>📖 <strong>Pensamento e Fala</strong> — Lev Vygotski</p>
+                        <p>📖 <strong>Terapia Centrada no Cliente</strong> — Carl Rogers</p>
+                        <p>📖 <strong>Comportamento Verbal</strong> — B.F. Skinner</p>
+                        <p>📖 <strong>Teoria Psicossocial do Desenvolvimento</strong> — Erik Erikson</p>
+                        <p>📖 <strong>Aprendizagem Social</strong> — Albert Bandura</p>
+                        <p>📖 <strong>Psicologia das Relações Interpessoais</strong> — Henri Wallon</p>
+                    </div>
+                </div>
+
+                <div id="subaba-abreviacoes" class="conteudo-subaba">
+                    <h3>🔤 Abreviações Comuns em Psicologia</h3>
+                    <div class="card-conteudo">
+                        <p><strong>DSM-5</strong> — Manual Diagnóstico e Estatístico de Transtornos Mentais</p>
+                        <p><strong>CID-11</strong> — Classificação Internacional de Doenças</p>
+                        <p><strong>ZDP</strong> — Zona de Desenvolvimento Proximal (Vygotski)</p>
+                        <p><strong>TEA</strong> — Transtorno do Espectro Autista</p>
+                        <p><strong>TDAH</strong> — Transtorno de Déficit de Atenção com Hiperatividade</p>
+                        <p><strong>TCC</strong> — Terapia Cognitivo-Comportamental</p>
+                        <p><strong>QI</strong> — Quociente de Inteligência</p>
+                        <p><strong>OMS</strong> — Organização Mundial da Saúde</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
